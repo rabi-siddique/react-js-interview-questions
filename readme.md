@@ -122,6 +122,20 @@ class ExplainBindingsComponent extends Component {
 ```
 Use this method if the repetitive binding in the constructor annoys you. The official React documentation sticks to the class method bindings in the constructor.
 
+# Controlled vs UnControlled Components
+In React, components can be categorized as either controlled or uncontrolled based on how they manage their data and state values.
+
+## Controlled Components:
+A controlled component in React relies on receiving its data and state values through props, which are managed by a parent component. This ensures a centralized and predictable flow of data, allowing the parent component to exert control over the state.
+
+## Uncontrolled Components:
+On the other hand, an uncontrolled component in React is one that internally handles its state. This means the component itself manages its own state without relying on external props for data updates.
+
+## Understanding Uncontrolled Components:
+For instance, an HTML input tag comes with a value attribute. The value attribute usually contains the value shown in the input field. Form elements such as <input>, <textarea>, and <select> hold their own state in plain HTML. They modify the value internally once someone changes it from the outside. In React, that’s called an uncontrolled component, because it handles its own state. We want to make sure those elements are controlled components instead.
+
+
+
 # Functional vs Class Based Components
 
 # What is JSX
