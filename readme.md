@@ -140,6 +140,41 @@ The constructor runs only once in the lifetime of a component, whereas the rende
 # What are functional stateless components?
 Functional Stateless Components are functions that take input and return an output. The inputs are the props, and the output is a component instance in plain JSX. They have no local state (stateless). You cannot access or update the state.
 
+# Ways of exporting
+In JavaScript ES6, you can import and export functionalities from modules. These can be functions, classes, components, constants, essentially anything you can assign to a variable. Modules can be single files or whole folders with one index file as entry point.
+
+The act of exporting one or multiple variables is called a named export:
+```js
+// file1
+const firstname = 'Rabi';
+const lastname = 'Siddique';
+
+export { firstname, lastname };
+```
+
+And import them in another file with a relative path to the first file.
+```js
+// file2.js
+import { firstname, lastname } from './file1.js';
+```
+
+There is also the default statement, which can be used to export and import a single functionality.
+
+```js
+// file1.js
+const person = {
+  firstname: 'Rabi',
+  lastname: 'Siddique',
+};
+
+export default person;
+```
+
+You have to leave out the curly braces to import the default export. Also the import name can differ from the exported default name.
+```js
+import rabi from './file1.js';
+```
+
 
 # Functional vs Class Based Components
 
@@ -147,7 +182,7 @@ Functional Stateless Components are functions that take input and return an outp
 
 # Normal variable vs useState variable
 
-# Ways of exporting
+
 
 # Why use key with Map
 
