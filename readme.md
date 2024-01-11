@@ -54,6 +54,73 @@ class ExplainBindingsComponent extends Component {
   }
 }
 ```
+Class method binding can happen somewhere else too. For instance, it can happen in the render() class method:
+```js
+class ExplainBindingsComponent extends Component {
+  onClickMe() {
+    console.log(this);
+  }
+
+  render() {
+    return (
+      <button
+        onClick={this.onClickMe.bind(this)}
+        type="button"
+      >
+        Click Me
+      </button>
+    );
+  }
+}
+```
+
+Avoid this practice, however, because it binds the class method every time the render() method runs, meaning every time the component updates, which will hurt your application’s performance eventually. Binding the class method in the constructor need only be done once, when the component is instantiated.
+
+Some developers will define the business logic of their class methods in the constructor:
+```js
+class ExplainBindingsComponent extends Component {
+  constructor() {
+    super();
+
+    this.onClickMe = () => {
+      console.log(this);
+    }
+  }
+
+  render() {
+    return (
+      <button
+        onClick={this.onClickMe}
+        type="button"
+      >
+        Click Me
+      </button>
+    );
+  }
+}
+```
+Avoid this approach as well, as it will clutter your constructor over time. The constructor is only there to instantiate your class with all its properties, so the business logic of class methods should be defined outside the constructor.
+
+Class methods can be auto-bound using JavaScript ES6 arrow functions:
+```js
+class ExplainBindingsComponent extends Component {
+  onClickMe = () => {
+    console.log(this);
+  }
+
+  render() {
+    return (
+      <button
+        onClick={this.onClickMe}
+        type="button"
+      >
+        Click Me
+      </button>
+    );
+  }
+}
+```
+Use this method if the repetitive binding in the constructor annoys you. The official React documentation sticks to the class method bindings in the constructor.
 
 # Functional vs Class Based Components
 
