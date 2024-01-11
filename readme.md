@@ -134,6 +134,11 @@ On the other hand, an uncontrolled component in React is one that internally han
 ## Understanding Uncontrolled Components:
 For instance, an HTML input tag comes with a value attribute. The value attribute usually contains the value shown in the input field. Form elements such as <input>, <textarea>, and <select> hold their own state in plain HTML. They modify the value internally once someone changes it from the outside. In React, that’s called an uncontrolled component, because it handles its own state. We want to make sure those elements are controlled components instead.
 
+# When does constructor method and render method runs in the context of class methods
+The constructor runs only once in the lifetime of a component, whereas the render() class method runs once at the beginning and every time the component updates. 
+
+# What are functional stateless components?
+Functional Stateless Components are functions that take input and return an output. The inputs are the props, and the output is a component instance in plain JSX. They have no local state (stateless). You cannot access or update the state.
 
 
 # Functional vs Class Based Components
