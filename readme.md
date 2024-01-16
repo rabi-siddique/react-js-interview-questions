@@ -54,52 +54,10 @@ class ExplainBindingsComponent extends Component {
   }
 }
 ```
-Class method binding can happen somewhere else too. For instance, it can happen in the render() class method:
-```js
-class ExplainBindingsComponent extends Component {
-  onClickMe() {
-    console.log(this);
-  }
 
-  render() {
-    return (
-      <button
-        onClick={this.onClickMe.bind(this)}
-        type="button"
-      >
-        Click Me
-      </button>
-    );
-  }
-}
-```
+Some things to avoid would be to stop binding in the render method. Because in that case, binding happens every time the render() method runs, meaning every time the component updates, which will hurt your application’s performance eventually. Binding the class method in the constructor need only be done once, when the component is instantiated.
 
-Avoid this practice, however, because it binds the class method every time the render() method runs, meaning every time the component updates, which will hurt your application’s performance eventually. Binding the class method in the constructor need only be done once, when the component is instantiated.
-
-Some developers will define the business logic of their class methods in the constructor:
-```js
-class ExplainBindingsComponent extends Component {
-  constructor() {
-    super();
-
-    this.onClickMe = () => {
-      console.log(this);
-    }
-  }
-
-  render() {
-    return (
-      <button
-        onClick={this.onClickMe}
-        type="button"
-      >
-        Click Me
-      </button>
-    );
-  }
-}
-```
-Avoid this approach as well, as it will clutter your constructor over time. The constructor is only there to instantiate your class with all its properties, so the business logic of class methods should be defined outside the constructor.
+Some developers will define the business logic of their class methods in the constructor. Avoid this approach as well, as it will clutter your constructor over time. The constructor is only there to instantiate your class with all its properties, so the business logic of class methods should be defined outside the constructor.
 
 Class methods can be auto-bound using JavaScript ES6 arrow functions:
 ```js
@@ -120,30 +78,21 @@ class ExplainBindingsComponent extends Component {
   }
 }
 ```
-Use this method if the repetitive binding in the constructor annoys you. The official React documentation sticks to the class method bindings in the constructor.
+Use this method if the repetitive binding in the constructor annoys you.
 
-# Controlled vs UnControlled Components
-In React, components can be categorized as either controlled or uncontrolled based on how they manage their data and state values.
+# What's the difference between Controlled and UnControlled Components?
+Controlled components get their data from a parent, using props. The state is typically handled by the parent component, and any changes to the state are passed down to the child component via props. On the other hand, Uncontrolled components do their own thing. They take care of their own data/state without relying on a parent to manage it.
 
-## Controlled Components:
-A controlled component in React relies on receiving its data and state values through props, which are managed by a parent component. This ensures a centralized and predictable flow of data, allowing the parent component to exert control over the state.
+Since the parent manages their state, controlled components are more predictable. Data flow is controlled and consistent, making it simpler to debug and trace issues. As changes in the component's state are initiated and directed by the parent. A downside with Controlled components would be that it involve more code to handle the flow of data between parent and child components. 
 
-## Uncontrolled Components:
-On the other hand, an uncontrolled component in React is one that internally handles its state. This means the component itself manages its own state without relying on external props for data updates.
+# What are Functional Stateless Components?
+These components are stateless, meaning they don't manage local state within the component. They solely rely on the input provided through props to determine their behavior and render content. Functional Stateless Components are functions that take input and return an output. The inputs are the props, and the output is a component instance in plain JSX. They have no local state (stateless). You cannot access or update the state.
 
-## Understanding Uncontrolled Components:
-For instance, an HTML input tag comes with a value attribute. The value attribute usually contains the value shown in the input field. Form elements such as <input>, <textarea>, and <select> hold their own state in plain HTML. They modify the value internally once someone changes it from the outside. In React, that’s called an uncontrolled component, because it handles its own state. We want to make sure those elements are controlled components instead.
-
-# When does constructor method and render method runs in the context of class methods
+# When does constructor method and render method runs in the context of class methods?
 The constructor runs only once in the lifetime of a component, whereas the render() class method runs once at the beginning and every time the component updates. 
 
-# What are functional stateless components?
-Functional Stateless Components are functions that take input and return an output. The inputs are the props, and the output is a component instance in plain JSX. They have no local state (stateless). You cannot access or update the state.
-
-# Ways of exporting
-In JavaScript ES6, you can import and export functionalities from modules. These can be functions, classes, components, constants, essentially anything you can assign to a variable. Modules can be single files or whole folders with one index file as entry point.
-
-The act of exporting one or multiple variables is called a named export:
+# What's the difference between Named & Default Exports?
+In JavaScript ES6, you can import and export functionalities from modules. These can be functions, classes, components, constants, essentially anything you can assign to a variable. The act of exporting one or multiple variables is called a named export:
 ```js
 // file1
 const firstname = 'Rabi';
@@ -158,7 +107,7 @@ And import them in another file with a relative path to the first file.
 import { firstname, lastname } from './file1.js';
 ```
 
-There is also the default statement, which can be used to export and import a single functionality.
+On the other hand, default statement can be used to export and import a single functionality.
 
 ```js
 // file1.js
@@ -181,8 +130,6 @@ import rabi from './file1.js';
 # What is JSX
 
 # Normal variable vs useState variable
-
-
 
 # Why use key with Map
 
