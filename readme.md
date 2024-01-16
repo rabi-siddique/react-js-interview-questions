@@ -143,6 +143,182 @@ import { createRoot } from "react-dom";
 ```
 This is better because when the final bundle is created, only the implemenation of createRoot is includeded. And not the entire ReactDOM.
 
+# Why Hooks should be placed at the top level of your React function?
+Don’t call Hooks inside loops, conditions, or nested functions. Instead, always use Hooks at the top level of your React function, before any early returns. By following this rule, you ensure that Hooks are called in the same order each time a component renders. That’s what allows React to correctly preserve the state of Hooks between multiple useState and useEffect calls.
+
+For example, consider this component:
+```js
+function Form() {
+  // 1. Use the name state variable
+  const [name, setName] = useState('Mary');
+
+  // 2. Use an effect for persisting the form
+  useEffect(function persistForm() {
+    localStorage.setItem('formData', name);
+  });
+
+  // 3. Use the surname state variable
+  const [surname, setSurname] = useState('Poppins');
+
+  // 4. Use an effect for updating the title
+  useEffect(function updateTitle() {
+    document.title = name + ' ' + surname;
+  });
+
+  // ...
+}
+
+```
+
+So how does React know which state corresponds to which useState call? The answer is that React relies on the order in which Hooks are called. Our example works because the order of the Hook calls is the same on every render:
+```js
+// ------------
+// First render
+// ------------
+useState('Mary')           // 1. Initialize the name state variable with 'Mary'
+useEffect(persistForm)     // 2. Add an effect for persisting the form
+useState('Poppins')        // 3. Initialize the surname state variable with 'Poppins'
+useEffect(updateTitle)     // 4. Add an effect for updating the title
+
+// -------------
+// Second render
+// -------------
+useState('Mary')           // 1. Read the name state variable (argument is ignored)
+useEffect(persistForm)     // 2. Replace the effect for persisting the form
+useState('Poppins')        // 3. Read the surname state variable (argument is ignored)
+useEffect(updateTitle)     // 4. Replace the effect for updating the title
+
+// ...
+
+```
+
+As long as the order of the Hook calls is the same between renders, React can associate some local state with each of them. But what happens if we put a Hook call (for example, the persistForm effect) inside a condition?
+```js
+ // 🔴 We're breaking the first rule by using a Hook in a condition
+  if (name !== '') {
+    useEffect(function persistForm() {
+      localStorage.setItem('formData', name);
+    });
+  }
+
+```
+
+The name !== '' condition is true on the first render, so we run this Hook. However, on the next render the user might clear the form, making the condition false. Now that we skip this Hook during rendering, the order of the Hook calls becomes different:
+```js
+useState('Mary')           // 1. Read the name state variable (argument is ignored)
+// useEffect(persistForm)  // 🔴 This Hook was skipped!
+useState('Poppins')        // 🔴 2 (but was 3). Fail to read the surname state variable
+useEffect(updateTitle)     // 🔴 3 (but was 4). Fail to replace the effect
+```
+
+React wouldn’t know what to return for the second useState Hook call. React expected that the second Hook call in this component corresponds to the persistForm effect, just like during the previous render, but it doesn’t anymore. From that point, every next Hook call after the one we skipped would also shift by one, leading to bugs.
+
+This is why Hooks must be called on the top level of our components. If we want to run an effect conditionally, we can put that condition inside our Hook:
+```js
+  useEffect(function persistForm() {
+    // 👍 We're not breaking the first rule anymore
+    if (name !== '') {
+      localStorage.setItem('formData', name);
+    }
+  });
+```
+
+Note that you don’t need to worry about this problem if you use the provided lint rule.
+
+# Why Local Variables are not suitable for states?
+There are two reasons why local reasons are not perfect to be used as states. 
+1. Betweeen re-renders the values of local variables are not preserved. It is set to its original value. This is because when React renders a component, it renders it from scratch. 
+2. Local variables dont trigger renders. Due to which we can't reflect the values of local variables on the screen in case they change.
+
+# How does React handle multiple consecutive calls to the set function of the state in the same render cycle?
+Within a render, the value of state remains the same. Also, when setting the state using `set` function, it changes it for the next render only. For example, consider this snippet:
+
+```js
+import { useState } from 'react';
+
+export default function Counter() {
+  const [number, setNumber] = useState(0);
+
+  return (
+    <>
+      <h1>{number}</h1>
+      <button onClick={() => {
+        setNumber(number + 1);
+        setNumber(number + 1);
+        setNumber(number + 1);
+      }}>+3</button>
+    </>
+  )
+}
+```
+
+In this snippet, upon clicking the button, you might think the state is being updated 3 times, so in the next render, the value might be 3. Which is not the case. React updates states only for the next render. 
+Which means no matter how many times you call `set` function, it will update state based on the current value for the very next render. Which in this will be 1. 
+
+# What are Refs in React?
+Refs are  useful when we want a component to remember information without triggering renders on value changes. You can use refs by importing the `useRef` hook and pass it an initial value: 
+
+```js
+import { useRef } from 'react';
+const ref = useRef(0);
+
+// Returns a plain object:
+
+/*
+
+{ 
+  current: 0 // The value you passed to useRef
+}
+
+*/
+```
+
+We can access the current value of the ref using `ref.current` property. This value is intentionally mutable, meaning you can both read and write to it.
+
+# How Refs are different from State?
+- `useRef(initialValue)` returns `{ current: initialValue }`. While `useState(initialValue)` returns the current value of a state variable and a state setter function `( [value, setValue])`.
+
+- Refs doesn’t trigger re-render when you change it, unlike states. 
+
+- Refs are mutable while state is immutable. 
+
+- Refs are synchronous. State acts like a snapshot for every render and doesn’t update synchronously. But when you mutate the current value of a ref, it changes immediately:
+```js
+ref.current = 5;
+console.log(ref.current); // 5
+```
+
+# When should we use Refs?
+Refs are handy when you want to step outside of React and perhaps want to access to some external browser APIs. Some situations we can use refs:
+
+- Storing timeout IDs.
+- Manipulating and accessing DOM elements directly. 
+
+Although, React automaitcally updates the DOM as a result we don't need to do it ourselves. However, there are times when we need access to a DOM element, for example to focus an input field, or getting the size of an element or scroll an element. React does not have any inbuilt method to do it. For this purpose, we can use of refs. Here is an example:
+
+```js
+import { useRef } from 'react';
+const myRef = useRef(null);
+<div ref={myRef}>
+```
+On the initial render, `myRef` contains `null` until when React creates the DOM and points `myRef.current` to the `div` containing it. We can now access this DOM node from our event handlers and use the built-in browser APIs defined on it. 
+
+# What are Forward Refs in React?
+You cannot attach refs to our own defined components. By default, React returns `null` in this case. And it is intentional behavior. You will in fact get this warning:
+
+```bash
+Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?
+```
+This is because by default, React does not allow component to access DOM nodes of another component, even if its a child component. Manually manipulating another component’s DOM nodes makes your code even more fragile.
+
+To make sure, a component provides access to its DOM nodes, we have to make use of `forwardRef`. A component can specify that it `forwards` its ref to one of its children. For example:
+
+```js
+const MyInput = forwardRef((props, ref) => {
+  return <input {...props} ref={ref} />;
+});
+```
+
 # Functional vs Class Based Components
 
 # What is JSX
