@@ -123,7 +123,25 @@ You have to leave out the curly braces to import the default export. Also the im
 ```js
 import rabi from './file1.js';
 ```
+# What is One-Way Data Flow in React and How it useful?
+React follows one way data flow. That means I can pass data from parent component to the child components. But, I cannot pass data from child components to parent components. 
 
+If I have an issue in the parent component. I know that it's because of the parent component and not the child component. Because, the child components cannot mess with it's parent component. Basically, it makes debugging in React straight-forward.
+
+# What is TreeShaking?
+Tree shaking is the optimization process that selectively includes only the essential, or live code in a final bundle. This technique ensures that the generated bundle contains only the code that is actively utilized in your project.
+
+For example, I make the import:
+```js
+import ReactDOM from "react-dom";
+
+```
+In this initial import, the entire react-dom library is included. However, with tree shaking, you can optimize further by importing only the specific component you require:
+```js
+import { createRoot } from "react-dom";
+
+```
+This is better because when the final bundle is created, only the implemenation of createRoot is includeded. And not the entire ReactDOM.
 
 # Functional vs Class Based Components
 
