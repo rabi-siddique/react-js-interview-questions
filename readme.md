@@ -533,7 +533,12 @@ export default function Signup() {
 }
 ```
 
-# Functional vs Class Based Components
+What is the difference between Functional and Class Based Components in React?
+1. Functional components utilize functions, whereas class-based components make use of ES6 classes.
+2. Since the advent of Hooks, functional components can use state through the `useState` hook. Conversely, class components manage local state using `this.state`.
+3. Class components have access to various lifecycle methods, such as `componentDidMount` and `componentDidUpdate`, which can be beneficial for specific tasks. Before the introduction of hooks, functional components lacked lifecycle methods. With hooks, they can now utilize lifecycle methods through useEffect.
+4. In terms of performance, class components entail slightly more overhead due to the additional complexity of class instantiation. However, in modern React applications with performance optimizations, the impact is often negligible.
+5. Functional components are generally considered more concise and readable. They are easier to understand and write, thanks to their reduced boilerplate code.
 
 # What is JSX
 
