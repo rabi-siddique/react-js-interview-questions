@@ -567,6 +567,8 @@ const element = React.createElement('h1', null, 'Hello, JSX!');
 The `React.createElement` function is a fundamental part of React and is used to create React elements. It takes the element type, props (attributes), and children as arguments.
 
 
-# React component cycle
-
-# Getting rid of the same network calls using map 
+# What is the React Component Lifecycle?
+The Three Main Phases in a component lifecycle are:
+1. **Mounting Phase:** This phase occurs when a component is initially created and inserted into the DOM.
+2. **Updating Phase:** This phase occurs when a component's state or props change, causing it to re-render.
+3. **Unmounting Phase:** This phase occurs when a component is removed from the DOM.
