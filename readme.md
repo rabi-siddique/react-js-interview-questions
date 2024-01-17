@@ -610,3 +610,24 @@ const AuthenticatedHomePage = withAuth(HomePage);
 ```
 
 The code defines a reusable function that can wrap around a React component. This wrapper function `withAuth`, checks whether a user is authenticated. If authenticated, it renders the original component; if not, it redirects to a login page.
+
+# What is the useMemo hook?
+`useMemo` is a React Hook that lets you cache the result of a calculation between re-renders.
+
+```js
+const cachedValue = useMemo(calculateValue, dependencies)
+```
+
+`calculateValue` is the function calculating the value that you want to cache. It should be pure, should take no arguments, and should return a value of any type. React will call your function during the initial render. On next renders, React will return the same value again if the `dependencies` have not changed since the last render. Otherwise, it will call `calculateValue`, return its result, and store it so it can be reused later.
+
+For example:
+```js
+import { useMemo } from 'react';
+
+function TodoList({ todos, tab }) {
+  const visibleTodos = useMemo(
+    () => filterTodos(todos, tab),
+    [todos, tab]
+  );
+}
+```
