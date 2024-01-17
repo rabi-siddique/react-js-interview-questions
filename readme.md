@@ -143,8 +143,8 @@ import { createRoot } from "react-dom";
 ```
 This is better because when the final bundle is created, only the implemenation of createRoot is includeded. And not the entire ReactDOM.
 
-# Why Hooks should be placed at the top level of your React function?
-Don’t call Hooks inside loops, conditions, or nested functions. Instead, always use Hooks at the top level of your React function, before any early returns. By following this rule, you ensure that Hooks are called in the same order each time a component renders. That’s what allows React to correctly preserve the state of Hooks between multiple useState and useEffect calls.
+# Why Hooks should be called at the top level of your React function?
+In React, Hooks should be called at the top of your functional component. We should not place them inside conditionals, loops or nested functions. But why? This is because React keeps track of the order by which these hooks are called. Using this order, React is able to maintain state values between re-renders. If you mix up the order of these steps, React gets confused, and it can't keep the data in order. 
 
 For example, consider this component:
 ```js
@@ -170,7 +170,7 @@ function Form() {
 
 ```
 
-So how does React know which state corresponds to which useState call? The answer is that React relies on the order in which Hooks are called. Our example works because the order of the Hook calls is the same on every render:
+How does React know which state corresponds to which useState call? The answer is that React relies on the order in which Hooks are called. Above example works because the order of the Hook calls is the same on every render:
 ```js
 // ------------
 // First render
@@ -192,7 +192,7 @@ useEffect(updateTitle)     // 4. Replace the effect for updating the title
 
 ```
 
-As long as the order of the Hook calls is the same between renders, React can associate some local state with each of them. But what happens if we put a Hook call (for example, the persistForm effect) inside a condition?
+As long as the order of the Hook calls is the same between renders, React can associate some local state with each of them. But what happens if we put a Hook call inside a condition?
 ```js
  // 🔴 We're breaking the first rule by using a Hook in a condition
   if (name !== '') {
@@ -212,18 +212,6 @@ useEffect(updateTitle)     // 🔴 3 (but was 4). Fail to replace the effect
 ```
 
 React wouldn’t know what to return for the second useState Hook call. React expected that the second Hook call in this component corresponds to the persistForm effect, just like during the previous render, but it doesn’t anymore. From that point, every next Hook call after the one we skipped would also shift by one, leading to bugs.
-
-This is why Hooks must be called on the top level of our components. If we want to run an effect conditionally, we can put that condition inside our Hook:
-```js
-  useEffect(function persistForm() {
-    // 👍 We're not breaking the first rule anymore
-    if (name !== '') {
-      localStorage.setItem('formData', name);
-    }
-  });
-```
-
-Note that you don’t need to worry about this problem if you use the provided lint rule.
 
 # Why Local Variables are not suitable for states?
 There are two reasons why local reasons are not perfect to be used as states. 
@@ -256,7 +244,7 @@ In this snippet, upon clicking the button, you might think the state is being up
 Which means no matter how many times you call `set` function, it will update state based on the current value for the very next render. Which in this will be 1. 
 
 # What are Refs in React?
-Refs are  useful when we want a component to remember information without triggering renders on value changes. You can use refs by importing the `useRef` hook and pass it an initial value: 
+Refs are useful when we want a component to remember information without triggering renders on value changes. You can use refs by importing the `useRef` hook and pass it an initial value: 
 
 ```js
 import { useRef } from 'react';
@@ -367,6 +355,124 @@ It re-renders with different props passed from its parent every second. Notice h
 
 # What is Painting in React?
 After rendering is done and React updated the DOM, the browser will repaint the screen. This process is known as `browser rendering`.
+
+
+# What are Effects in React?
+Effects let you run some code after rendering so that you can synchronize your component with some system outside of React Effects run at the end of a commit after the screen updates. An example of an effect is connecting to Chat server after the app loads, in case of a chat app. Which can done using the `useEffect` hock:
+
+```js
+import { useEffect } from 'react';
+
+function MyComponent() {
+  useEffect(() => {
+    // Code here will run after *every* render
+  });
+  return <div />;
+}
+```
+Every time your component renders, React will update the screen and then run the code inside useEffect. **In other words, useEffect “delays” a piece of code from running until that render is reflected on the screen.**
+
+Summary of declaration of `useEffect`:
+```js
+useEffect(() => {
+  // This runs after every render
+});
+
+useEffect(() => {
+  // This runs only on mount (when the component appears)
+}, []);
+
+useEffect(() => {
+  // This runs on mount *and also* if either a or b have changed since the last render
+}, [a, b]);
+```
+
+# What are cleanup functions in useEffect?
+Some Effects need to specify how to stop, undo, or clean up whatever they were doing. For example, `connect` needs `disconnect`, `subscribe` needs `unsubscribe`, and `fetch` needs either `cancel` or `ignore`. You do this by returning a cleanup function.
+
+You’re writing a ChatRoom component that needs to connect to the chat server when it appears. You are given a `createConnection()` API that returns an object with `connect()` and `disconnect()` methods. Something like:
+
+```js
+function createConnection() {
+  // A real implementation would actually connect to the server
+  return {
+    connect() {
+      console.log('✅ Connecting...');
+    },
+    disconnect() {
+      console.log('❌ Disconnected.');
+    }
+  };
+}
+
+useEffect(() => {
+  const connection = createConnection();
+  connection.connect();
+}, []);
+```
+
+Imagine the `ChatRoom` component is a part of a larger app with many different screens. The user starts their journey on the `ChatRoom` page. The component mounts and calls `connection.connect()`. Then imagine the user navigates to another screen—for example, to the `Settings` page. The `ChatRoom` component unmounts. Finally, the user clicks `Back` and `ChatRoom` mounts again. This would set up a second connection—but the first connection was never destroyed! As the user navigates across the app, the connections would keep piling up.
+
+To fix the issue, return a cleanup function from your Effect:
+
+```js
+  useEffect(() => {
+    const connection = createConnection();
+    connection.connect();
+    return () => {
+      connection.disconnect();
+    };
+  }, []);
+```
+React will call your cleanup function each time before the Effect runs again, and one final time when the component unmounts (gets removed). Let’s see what happens when the cleanup function is implemented:
+
+
+# Why does useEffect prints `✅ Connecting...` twice in code example below?
+Code Example:
+```js
+function createConnection() {
+  // A real implementation would actually connect to the server
+  return {
+    connect() {
+      console.log('✅ Connecting...');
+    },
+    disconnect() {
+      console.log('❌ Disconnected.');
+    }
+  };
+}
+
+useEffect(() => {
+  const connection = createConnection();
+  connection.connect();
+}, []);
+```
+
+This Effect only runs on **mount**, so you might expect `✅ Connecting...` to be printed once in the console. However, if you check the console, `✅ Connecting...` gets printed twice. Why does it happen?
+
+Seeing the `✅ Connecting...` log twice helps you notice the real issue: your code doesn’t close the connection when the component unmounts. Bugs like this are easy to miss without extensive manual testing. To help you spot them quickly, in development React remounts every component once immediately after its initial mount.
+
+To fix the issue, return a cleanup function from your Effect:
+
+```js
+  useEffect(() => {
+    const connection = createConnection();
+    connection.connect();
+    return () => {
+      connection.disconnect();
+    };
+  }, []);
+```
+
+Let’s see what happens when the cleanup function is implemented. Now you get three console logs in development:
+
+1. `✅ Connecting...`
+2. `❌ Disconnected.`
+3. `✅ Connecting...`
+
+This is the correct behavior in development. By remounting your component, React verifies that navigating away and back would not break your code. Disconnecting and then connecting again is exactly what should happen! When you implement the cleanup well, there should be no user-visible difference between running the Effect once vs running it, cleaning it up, and running it again. There’s an extra connect/disconnect call pair because React is probing your code for bugs in development. 
+
+In production, you would only see `✅ Connecting...` printed once. Remounting components only happens in development to help you find Effects that need cleanup. You can turn off Strict Mode to opt out of the development behavior. 
 
 # Functional vs Class Based Components
 
