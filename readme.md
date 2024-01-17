@@ -474,6 +474,65 @@ This is the correct behavior in development. By remounting your component, React
 
 In production, you would only see `✅ Connecting...` printed once. Remounting components only happens in development to help you find Effects that need cleanup. You can turn off Strict Mode to opt out of the development behavior. 
 
+# How to stop Event Propagation in React?
+By default, events bubbles up or propagates in React. It starts with where the event happened, and then goes up the tree.
+
+```js
+export default function Toolbar() {
+  return (
+    <div className="Toolbar" onClick={() => {
+      alert('You clicked on the toolbar!');
+    }}>
+      <button onClick={() => alert('Playing!')}>
+        Play Movie
+      </button>
+      <button onClick={() => alert('Uploading!')}>
+        Upload Image
+      </button>
+    </div>
+  );
+}
+```
+
+In the example above, no matter which button we click, two callbacks will be called. One for the button we clicked and one for the `div`. To stop this, we use the `event` object received by event handlers. By convention, it’s usually called `e`, which stands for `event`. You can use this object to read information about the event. That event object also lets you stop the propagation. If you want to prevent an event from reaching parent components, you need to call `e.stopPropagation()` like this: Button component does:
+
+```js
+export default function Toolbar() {
+  return (
+    <div className="Toolbar" onClick={(e) => {
+      e.stopPropagation();
+      alert('You clicked on the toolbar!');
+    }}>
+      <button onClick={() => alert('Playing!')}>
+        Play Movie
+      </button>
+      <button onClick={(e) => {
+        e.stopPropagation();
+        alert('Uploading!')}}>
+        Upload Image
+      </button>
+    </div>
+  );
+}
+```
+
+# How to prevent Page Reloads on Form Submission in React?
+Some browser events have default behavior associated with them. For example, a `<form>` submit event, which happens when a button inside of it is clicked, will reload the whole page by default. You can call `e.preventDefault()` on the event object to stop this from happening:
+
+```js
+export default function Signup() {
+  return (
+    <form onSubmit={e => {
+      e.preventDefault();
+      alert('Submitting!');
+    }}>
+      <input />
+      <button>Send</button>
+    </form>
+  );
+}
+```
+
 # Functional vs Class Based Components
 
 # What is JSX
