@@ -553,7 +553,19 @@ const listItems = myList.map((item) => (
 ));
 ```
 
-# What is JSX
+# What is JSX?
+JSX is a syntax extension for JavaScript recommended by React. It looks similar to XML/HTML, but it allows you to write JavaScript code within your JavaScript files. JSX makes it more convenient to describe what the UI should look like. React elements are typically created using JSX. For example, the JSX code:
+
+```js
+const element = <h1>Hello, JSX!</h1>;
+```
+is transpiled by Babel into the following JavaScript code:
+```js
+const element = React.createElement('h1', null, 'Hello, JSX!');
+```
+
+The `React.createElement` function is a fundamental part of React and is used to create React elements. It takes the element type, props (attributes), and children as arguments.
+
 
 # React component cycle
 
