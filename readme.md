@@ -1,3 +1,18 @@
+# What is the Virtual DOM?
+The Virtual DOM (Document Object Model) is a concept used in web development frameworks, particularly popularized by React. It is a lightweight copy of the actual DOM, a representation of the structure of a web page. When changes are made to the data in a web application, the Virtual DOM is updated first rather than directly manipulating the real DOM.
+
+A simplified process of how the Virtual DOM works:
+
+**Initial Render**: The Virtual DOM is created based on the initial state of the application.
+
+**Updates**: When the state of the application changes, a new Virtual DOM is created.
+
+**Diffing**: The new Virtual DOM is compared with the previous one to identify the differences or changes (diffing).
+
+**Reconciliation**: Only the differences are then applied to the actual DOM, minimizing the amount of manipulation needed and improving performance.
+
+The Virtual DOM helps optimize the rendering process by reducing the number of direct manipulations on the real DOM, which is a more expensive operation.
+
 # What does `create-react-app` do?
 It is a command line tool that helps create a boilerplate react project with the pre-configured development environment. 
 
@@ -631,3 +646,91 @@ function TodoList({ todos, tab }) {
   );
 }
 ```
+
+# What is Lifting State Up in React?
+Lifting State Up is a pattern in React where the state is moved to a higher-level (parent) component from its child components. This is done to share state among sibling components or to allow a common ancestor to control the state of multiple components.
+
+```js
+// Parent.js
+import React, { useState } from 'react';
+import ChildA from './ChildA';
+import ChildB from './ChildB';
+
+function Parent() {
+  const [sharedState, setSharedState] = useState('');
+
+  const handleStateChange = (newState) => {
+    setSharedState(newState);
+  };
+
+  return (
+    <div>
+      <ChildA sharedState={sharedState} onStateChange={handleStateChange} />
+      <ChildB sharedState={sharedState} />
+    </div>
+  );
+}
+
+// ChildA.js
+import React from 'react';
+
+function ChildA({ sharedState, onStateChange }) {
+  const handleChange = (e) => {
+    onStateChange(e.target.value);
+  };
+
+  return (
+    <div>
+      <input type="text" value={sharedState} onChange={handleChange} />
+    </div>
+  );
+}
+
+// ChildB.js
+import React from 'react';
+
+function ChildB({ sharedState }) {
+  return (
+    <div>
+      <p>Shared State: {sharedState}</p>
+    </div>
+  );
+}
+```
+# What is children prop?
+In React, the children prop is a special prop that can be used to pass components or elements as children to another component. It allows a parent component to include arbitrary children components or elements within its JSX. The content passed as children is then accessible within the parent component using props.children. This makes it flexible for creating reusable and compositional components.
+
+# What are Pure Components?
+Pure Components in React are a specific type of React component that automatically implements the shouldComponentUpdate lifecycle method with a shallow prop and state comparison. This means that a Pure Component will not re-render unless the actual data passed to it has changed. Pure Components can help optimize performance by preventing unnecessary renders when the component's output would be the same.
+
+# What are portals in React?
+Portals in React provide a way to render children components outside the DOM hierarchy of the parent component. Portals allow you to render components at a different DOM node than their parent, without affecting the parent's styles or behavior.
+
+# When should we use fragments compared to divs?
+Fragments in React are a lightweight way to group multiple elements without introducing an additional wrapping div to the DOM. Using fragments `(<>...</>)` helps avoid unnecessary and potentially undesirable nesting of elements. This is particularly beneficial when you want to keep your DOM structure clean and minimal, especially in cases where a wrapping div might interfere with styles or cause unintended layout effects.
+
+#	What are error boundaries in React? 
+Error boundaries are React components that catch JavaScript errors anywhere in their component tree and log those errors, display a fallback UI, and prevent the error from crashing the entire component tree. They are implemented using the componentDidCatch lifecycle method.
+
+Example of an error boundary component:
+```js
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    this.setState({ hasError: true });
+    // Log the error to an error reporting service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+    return this.props.children;
+  }
+}
+```
+Also, this is possible in class based components only at the moment. There is currently no way to write an error boundary as a function component. You can use `react-error-boundary` package though.  
