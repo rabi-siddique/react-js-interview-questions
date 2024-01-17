@@ -572,3 +572,41 @@ The Three Main Phases in a component lifecycle are:
 1. **Mounting Phase:** This phase occurs when a component is initially created and inserted into the DOM.
 2. **Updating Phase:** This phase occurs when a component's state or props change, causing it to re-render.
 3. **Unmounting Phase:** This phase occurs when a component is removed from the DOM.
+
+# What are Higher Order Components in React?
+Higher Order Components (HOCs) are a pattern in React, a popular JavaScript library for building user interfaces. They are functions that take a component and return a new component with enhanced functionality. The term "higher order" comes from functional programming, where functions can take other functions as arguments or return them as results. HOCs provide a way to reuse component logic, share code between components, and abstract common functionality. For example see this code:
+
+```js
+import React, { useEffect, useState } from 'react';
+import { Redirect } from 'react-router-dom';
+
+// Higher Order Component for Authentication
+const withAuth = (WrappedComponent) => {
+  return (props) => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+      const checkAuthentication = async () => {
+        // Logic for checking authentication
+        const isAuthenticated = /* Check if user is authenticated */ true;
+        setIsAuthenticated(isAuthenticated);
+      };
+
+      checkAuthentication();
+    }, []); 
+
+    if (isAuthenticated) {
+      // If authenticated, render the wrapped component
+      return <WrappedComponent {...props} />;
+    } else {
+      // If not authenticated, redirect to the login page
+      return <Redirect to="/login" />;
+    }
+  };
+};
+
+const HomePage = () => <div>Welcome to the Home Page!</div>;
+const AuthenticatedHomePage = withAuth(HomePage);
+```
+
+The code defines a reusable function that can wrap around a React component. This wrapper function `withAuth`, checks whether a user is authenticated. If authenticated, it renders the original component; if not, it redirects to a login page.
