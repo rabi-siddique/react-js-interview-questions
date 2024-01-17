@@ -533,19 +533,28 @@ export default function Signup() {
 }
 ```
 
-What is the difference between Functional and Class Based Components in React?
+# What is the difference between Functional and Class Based Components in React?
 1. Functional components utilize functions, whereas class-based components make use of ES6 classes.
 2. Since the advent of Hooks, functional components can use state through the `useState` hook. Conversely, class components manage local state using `this.state`.
 3. Class components have access to various lifecycle methods, such as `componentDidMount` and `componentDidUpdate`, which can be beneficial for specific tasks. Before the introduction of hooks, functional components lacked lifecycle methods. With hooks, they can now utilize lifecycle methods through useEffect.
 4. In terms of performance, class components entail slightly more overhead due to the additional complexity of class instantiation. However, in modern React applications with performance optimizations, the impact is often negligible.
 5. Functional components are generally considered more concise and readable. They are easier to understand and write, thanks to their reduced boilerplate code.
 
+# Why is it important to use the key attribute when using map in React?
+In React, the key attribute is used when rendering a list of elements, typically with the map function, to help React identify which items have changed, been added, or been removed. The key should be a unique identifier for each element in the list.
+
+React uses the key attribute to optimize the updating of the virtual DOM. When a list changes, React compares the new list with the previous one using keys. This allows React to efficiently update only the elements that have changed or are new, rather than re-rendering the entire list.
+
+```js
+const myList = ["item1", "item2", "item3"];
+
+const listItems = myList.map((item) => (
+  <li key={item}>{item}</li>
+));
+```
+
 # What is JSX
 
-# Why use key with Map
-
 # React component cycle
-
-# Dynamic ClassName
 
 # Getting rid of the same network calls using map 
