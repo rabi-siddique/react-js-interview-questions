@@ -319,11 +319,58 @@ const MyInput = forwardRef((props, ref) => {
 });
 ```
 
+# How many steps are involved in any React Screen Update?
+Any screen update in a React app happens in three steps:
+1. Trigger
+2. Render
+3. Commit
+
+# How to Trigger a render in React?
+A render is trigger in React only two times. These are:
+1. Initial render of the component. It’s done by calling `createRoot` with the target DOM node, and then calling its render method with your component. Here is the code:
+
+```js
+import Image from './Image.js';
+import { createRoot } from 'react-dom/client';
+
+const root = createRoot(document.getElementById('root'))
+root.render(<Image />);
+
+```
+If we comment out this portion of the code, we will see a blank screen. 
+
+2. A component's state is updated. When a component has been rendered initially we can trigger renders by updating state of the component using `set` function. 
+
+# What is Rendering in React?
+Rendering in React involves invoking functions. On the initial render its invoking the function of the root component. Subsequent renders invole invoking the function of the component whose state has been updated, along with any nested components.
+
+During this rendering process, React assesses the properties of these components to identify changes. The goal is to determine the most efficient way to apply these changes to the actual DOM. However, this information is not immediately utilized; it is held until the commit phase.
+
+# What is the Commit Phase in React?
+After rendering our components, React will modify the DOM now. 
+
+1. For the initial render, React will use the appendChild() DOM API to put all the DOM nodes it has created on screen.
+2. For re-renders, React will apply the minimal necessary operations (calculated while rendering!) to make the DOM match the latest rendering output.
+
+React only changes the DOM nodes if there’s a difference between renders. For example, Consider this component:
+```js
+export default function Clock({ time }) {
+  return (
+    <>
+      <h1>{time}</h1>
+      <input />
+    </>
+  );
+}
+```
+It re-renders with different props passed from its parent every second. Notice how you can add some text into the `<input>`, updating its value, but the text doesn’t disappear when the component re-renders. This works because during this last step, React only updates the content of `<h1>` with the new time. It sees that the `<input>` appears in the JSX in the same place as last time, so React doesn’t touch the `<input>` or its value.
+
+# What is Painting in React?
+After rendering is done and React updated the DOM, the browser will repaint the screen. This process is known as `browser rendering`.
+
 # Functional vs Class Based Components
 
 # What is JSX
-
-# Normal variable vs useState variable
 
 # Why use key with Map
 
